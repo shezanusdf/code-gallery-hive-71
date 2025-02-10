@@ -100,12 +100,14 @@ export default function Index() {
   );
 
   return (
-    <div className="min-h-screen bg-background px-4 py-8 transition-colors">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 px-4 py-8 transition-colors dark:from-gray-900 dark:to-gray-800">
       <ThemeToggle />
       
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-8xl">
         <div className="mb-12 flex flex-col items-center gap-4 text-center">
-          <h1 className="text-4xl font-bold">Coding Q&A Gallery</h1>
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400">
+            Coding Q&A Gallery
+          </h1>
           <p className="text-lg text-muted-foreground">
             Find answers to common coding questions
           </p>
@@ -113,7 +115,7 @@ export default function Index() {
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
             <Link
               to="/add"
-              className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+              className="flex items-center gap-2 rounded-full bg-gradient-to-r from-gray-900 to-gray-700 px-4 py-2 text-sm text-white transition-all duration-300 hover:opacity-90 dark:from-gray-100 dark:to-gray-300 dark:text-gray-900"
             >
               <Plus className="h-4 w-4" />
               Add Question
@@ -121,7 +123,7 @@ export default function Index() {
           </div>
         </div>
 
-        <div className="masonry-grid">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-min">
           {filteredQuestions.map((question) => (
             <QuestionCard key={question.id} question={question} />
           ))}
@@ -130,3 +132,5 @@ export default function Index() {
     </div>
   );
 }
+
+export default Index;
