@@ -22,7 +22,7 @@ export type Database = {
           answer: string
           created_at?: string
           description: string
-          id: number
+          id?: number
           tags?: string[]
           title: string
         }

@@ -1,32 +1,50 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const tags = ["MYSQL", "STACK", "BINARY", "CSV", "TXT"];
 
 export default function AddQuestion() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [answer, setAnswer] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would normally send this to a backend
-    const newQuestion = {
-      id: Date.now(), // temporary ID generation
-      title,
-      description,
-      answer,
-      tags: selectedTags,
-    };
     
-    // For now, we'll just store in localStorage
-    const existingQuestions = JSON.parse(localStorage.getItem("questions") || "[]");
-    localStorage.setItem("questions", JSON.stringify([...existingQuestions, newQuestion]));
-    
-    navigate("/");
+    try {
+      const { error } = await supabase
+        .from('questions')
+        .insert([
+          {
+            title,
+            description,
+            answer,
+            tags: selectedTags,
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Question added successfully",
+      });
+      
+      navigate("/");
+    } catch (error) {
+      console.error('Error adding question:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add question",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

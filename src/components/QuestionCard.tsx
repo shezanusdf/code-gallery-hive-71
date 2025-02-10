@@ -5,6 +5,8 @@ import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { useToast } from "./ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface QuestionCardProps {
   question: {
@@ -21,29 +23,62 @@ export function QuestionCard({ question }: QuestionCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedQuestion, setEditedQuestion] = useState(question);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const handleDelete = () => {
-    const questions = JSON.parse(localStorage.getItem("questions") || "[]");
-    const updatedQuestions = questions.filter((q: any) => q.id !== question.id);
-    localStorage.setItem("questions", JSON.stringify(updatedQuestions));
-    toast({
-      title: "Question deleted",
-      description: "The question has been successfully deleted.",
-    });
-    window.location.reload();
+  const handleDelete = async () => {
+    try {
+      const { error } = await supabase
+        .from('questions')
+        .delete()
+        .eq('id', question.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Question deleted",
+        description: "The question has been successfully deleted.",
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['questions'] });
+    } catch (error) {
+      console.error('Error deleting question:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete question",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleSave = () => {
-    const questions = JSON.parse(localStorage.getItem("questions") || "[]");
-    const updatedQuestions = questions.map((q: any) =>
-      q.id === question.id ? editedQuestion : q
-    );
-    localStorage.setItem("questions", JSON.stringify(updatedQuestions));
-    setIsEditing(false);
-    toast({
-      title: "Question updated",
-      description: "Your changes have been saved successfully.",
-    });
+  const handleSave = async () => {
+    try {
+      const { error } = await supabase
+        .from('questions')
+        .update({
+          title: editedQuestion.title,
+          description: editedQuestion.description,
+          answer: editedQuestion.answer,
+          tags: editedQuestion.tags,
+        })
+        .eq('id', question.id);
+
+      if (error) throw error;
+
+      setIsEditing(false);
+      toast({
+        title: "Question updated",
+        description: "Your changes have been saved successfully.",
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['questions'] });
+    } catch (error) {
+      console.error('Error updating question:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update question",
+        variant: "destructive",
+      });
+    }
   };
 
   if (isEditing) {
