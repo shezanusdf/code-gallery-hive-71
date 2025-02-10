@@ -48,7 +48,7 @@ export function QuestionCard({ question }: QuestionCardProps) {
 
   if (isEditing) {
     return (
-      <div className="relative rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+      <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
         <div className="flex flex-col gap-4">
           <div>
             <Label htmlFor="title">Title</Label>
@@ -87,6 +87,21 @@ export function QuestionCard({ question }: QuestionCardProps) {
             />
           </div>
 
+          <div>
+            <Label htmlFor="tags">Tags (comma-separated)</Label>
+            <Input
+              id="tags"
+              value={editedQuestion.tags.join(", ")}
+              onChange={(e) =>
+                setEditedQuestion({
+                  ...editedQuestion,
+                  tags: e.target.value.split(",").map((tag) => tag.trim().toUpperCase()),
+                })
+              }
+              placeholder="Enter tags separated by commas"
+            />
+          </div>
+
           <div className="flex gap-2">
             <Button onClick={handleSave}>Save</Button>
             <Button
@@ -105,7 +120,7 @@ export function QuestionCard({ question }: QuestionCardProps) {
   }
 
   return (
-    <div className="group inline-block w-auto rounded-lg bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-xl dark:bg-gray-800 animate-fade-in">
+    <div className="inline-block w-full rounded-lg bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-xl dark:bg-gray-800">
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-start">
           <div className="flex flex-wrap gap-2">
@@ -118,7 +133,7 @@ export function QuestionCard({ question }: QuestionCardProps) {
               </span>
             ))}
           </div>
-          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex gap-2">
             <Button
               variant="ghost"
               size="icon"

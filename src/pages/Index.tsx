@@ -123,7 +123,7 @@ export default function Index() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-min">
+        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 [&>*]:mb-6 [&>*]:break-inside-avoid">
           {filteredQuestions.map((question) => (
             <QuestionCard key={question.id} question={question} />
           ))}
