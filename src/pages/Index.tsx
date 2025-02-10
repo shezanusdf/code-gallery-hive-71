@@ -1,86 +1,95 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { SearchBar } from "../components/SearchBar";
 import { QuestionCard } from "../components/QuestionCard";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { Plus } from "lucide-react";
 
-// Sample data - in a real app this would come from an API
-const questions = [
+// Default questions if localStorage is empty
+const defaultQuestions = [
   {
     id: 1,
-    title: "How to center a div?",
-    description: "Learn the different ways to center content in CSS",
-    answer: `There are several ways to center a div:
+    title: "How to export MySQL database to CSV?",
+    description: "Learn how to export your MySQL database to a CSV file format",
+    answer: `There are several ways to export a MySQL database to CSV:
 
-1. Using Flexbox:
-.parent {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+1. Using MySQL Command Line:
+SELECT * FROM table_name
+INTO OUTFILE 'file_path.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
 
-2. Using Grid:
-.parent {
-  display: grid;
-  place-items: center;
-}
+2. Using mysqldump:
+mysqldump -u username -p database_name table_name --tab=/tmp/
 
-3. Using position absolute:
-.child {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}`,
-    tags: ["CSS", "Layout", "Flexbox"],
+3. Using phpMyAdmin:
+- Select your table
+- Click on "Export"
+- Choose "CSV" as the format
+- Configure options
+- Click "Go"`,
+    tags: ["MYSQL", "CSV"],
   },
   {
     id: 2,
-    title: "What is the difference between let and const?",
-    description: "Understanding variable declarations in JavaScript",
-    answer: `let allows you to declare variables that can be reassigned, while const declares variables that cannot be reassigned after initialization.
+    title: "Understanding Stack Operations",
+    description: "Basic operations and implementation of a stack data structure",
+    answer: `A stack is a Last-In-First-Out (LIFO) data structure. Here are the main operations:
 
-Example:
-let x = 1;
-x = 2; // This works
+1. Push: Add element to top
+stack.push(element)
 
-const y = 1;
-y = 2; // This throws an error`,
-    tags: ["JavaScript", "ES6", "Variables"],
+2. Pop: Remove top element
+stack.pop()
+
+3. Peek/Top: View top element
+stack.peek()
+
+4. isEmpty: Check if stack is empty
+stack.isEmpty()
+
+Common implementations:
+- Using arrays
+- Using linked lists
+- Using dynamic arrays`,
+    tags: ["STACK"],
   },
   {
     id: 3,
-    title: "How to handle async operations in React?",
-    description: "Best practices for managing asynchronous operations",
-    answer: `There are several ways to handle async operations in React:
+    title: "Converting Text to Binary",
+    description: "How to convert text files to binary format",
+    answer: `Here are methods to convert text to binary:
 
-1. Using async/await:
-async function fetchData() {
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    setState(data);
-  } catch (error) {
-    console.error(error);
+1. Using JavaScript:
+const text = "Hello";
+const binary = text.split('').map(char => 
+  char.charCodeAt(0).toString(2).padStart(8, '0')
+).join(' ');
+
+2. Using Python:
+text = "Hello"
+binary = ' '.join(format(ord(c), '08b') for c in text)
+
+3. Using Unix command:
+xxd -b input.txt output.bin`,
+    tags: ["BINARY", "TXT"],
   }
-}
-
-2. Using useEffect:
-useEffect(() => {
-  fetchData();
-}, []);
-
-3. Using Promise.then():
-fetch(url)
-  .then(response => response.json())
-  .then(data => setState(data))
-  .catch(error => console.error(error));`,
-    tags: ["React", "Async", "Hooks"],
-  },
 ];
 
 export default function Index() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [questions, setQuestions] = useState(defaultQuestions);
+
+  useEffect(() => {
+    const storedQuestions = localStorage.getItem("questions");
+    if (storedQuestions) {
+      setQuestions(JSON.parse(storedQuestions));
+    } else {
+      localStorage.setItem("questions", JSON.stringify(defaultQuestions));
+    }
+  }, []);
 
   const filteredQuestions = questions.filter((question) =>
     question.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -100,7 +109,16 @@ export default function Index() {
           <p className="text-lg text-muted-foreground">
             Find answers to common coding questions
           </p>
-          <SearchBar value={searchQuery} onChange={setSearchQuery} />
+          <div className="flex w-full max-w-xl items-center gap-4">
+            <SearchBar value={searchQuery} onChange={setSearchQuery} />
+            <Link
+              to="/add"
+              className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="h-4 w-4" />
+              Add Question
+            </Link>
+          </div>
         </div>
 
         <div className="masonry-grid">

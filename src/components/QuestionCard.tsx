@@ -37,7 +37,9 @@ export function QuestionCard({ question }: QuestionCardProps) {
           }`}
         >
           <div className="mt-4 rounded-md bg-accent p-4">
-            <pre className="whitespace-pre-wrap text-sm">{question.answer}</pre>
+            <pre className="max-h-80 overflow-y-auto whitespace-pre-wrap text-sm">
+              {question.answer}
+            </pre>
           </div>
         </div>
 
