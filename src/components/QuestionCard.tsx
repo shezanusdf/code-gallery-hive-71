@@ -48,7 +48,7 @@ export function QuestionCard({ question }: QuestionCardProps) {
 
   if (isEditing) {
     return (
-      <div className="relative overflow-hidden rounded-lg bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl dark:bg-gray-800">
+      <div className="relative rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
         <div className="flex flex-col gap-4">
           <div>
             <Label htmlFor="title">Title</Label>
@@ -105,7 +105,7 @@ export function QuestionCard({ question }: QuestionCardProps) {
   }
 
   return (
-    <div className="group relative overflow-hidden rounded-lg bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-xl dark:bg-gray-800 animate-fade-in">
+    <div className="group inline-block w-auto rounded-lg bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-xl dark:bg-gray-800 animate-fade-in">
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-start">
           <div className="flex flex-wrap gap-2">
