@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { ChevronDown, Pencil, Trash2 } from "lucide-react";
+import { ChevronDown, Pencil, Trash2, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
@@ -20,6 +20,7 @@ export function QuestionCard({ question }: QuestionCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedQuestion, setEditedQuestion] = useState(question);
+  const [newTag, setNewTag] = useState("");
   const { toast } = useToast();
 
   const handleDelete = () => {
@@ -43,6 +44,25 @@ export function QuestionCard({ question }: QuestionCardProps) {
     toast({
       title: "Question updated",
       description: "Your changes have been saved successfully.",
+    });
+  };
+
+  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && newTag.trim()) {
+      if (!editedQuestion.tags.includes(newTag.trim().toUpperCase())) {
+        setEditedQuestion({
+          ...editedQuestion,
+          tags: [...editedQuestion.tags, newTag.trim().toUpperCase()]
+        });
+      }
+      setNewTag("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setEditedQuestion({
+      ...editedQuestion,
+      tags: editedQuestion.tags.filter(tag => tag !== tagToRemove)
     });
   };
 
@@ -84,6 +104,33 @@ export function QuestionCard({ question }: QuestionCardProps) {
               onChange={(e) =>
                 setEditedQuestion({ ...editedQuestion, answer: e.target.value })
               }
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="tags">Tags</Label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {editedQuestion.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-700 px-3 py-1 text-xs font-medium text-gray-800 dark:text-gray-200"
+                >
+                  {tag}
+                  <button
+                    onClick={() => handleRemoveTag(tag)}
+                    className="hover:text-red-500"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+            <Input
+              id="tags"
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+              onKeyDown={handleAddTag}
+              placeholder="Type a tag and press Enter"
             />
           </div>
 
