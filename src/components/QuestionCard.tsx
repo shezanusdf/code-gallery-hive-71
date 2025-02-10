@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { ChevronDown, Pencil, Trash2, X } from "lucide-react";
+import { ChevronDown, Pencil, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
@@ -105,10 +105,8 @@ export function QuestionCard({ question }: QuestionCardProps) {
   }
 
   return (
-    <div className={`group relative overflow-hidden rounded-lg bg-white shadow-sm transition-all duration-300 dark:bg-gray-800 animate-fade-in
-      ${isExpanded ? "fixed inset-4 z-50 overflow-y-auto" : "p-6 hover:shadow-xl"}`}
-    >
-      <div className={`flex flex-col gap-2 ${isExpanded ? "h-full p-6" : ""}`}>
+    <div className="group relative overflow-hidden rounded-lg bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-xl dark:bg-gray-800 animate-fade-in">
+      <div className="flex flex-col gap-2">
         <div className="flex justify-between items-start">
           <div className="flex flex-wrap gap-2">
             {question.tags.map((tag) => (
@@ -121,39 +119,26 @@ export function QuestionCard({ question }: QuestionCardProps) {
             ))}
           </div>
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            {isExpanded ? (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsExpanded(false)}
-                className="h-8 w-8 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsEditing(true)}
-                  className="h-8 w-8 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleDelete}
-                  className="h-8 w-8 bg-gray-100 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-red-900/50 text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </>
-            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsEditing(true)}
+              className="h-8 w-8 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleDelete}
+              className="h-8 w-8 bg-gray-100 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-red-900/50 text-destructive hover:text-destructive"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
-        <h3 className={`font-semibold text-gray-900 dark:text-gray-100 ${isExpanded ? "text-2xl" : "text-lg"}`}>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           {question.title}
         </h3>
         <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -162,25 +147,27 @@ export function QuestionCard({ question }: QuestionCardProps) {
         
         <div
           className={`overflow-hidden transition-all duration-300 ${
-            isExpanded ? "block" : "max-h-0"
+            isExpanded ? "max-h-96" : "max-h-0"
           }`}
         >
           <div className="mt-4 rounded-md bg-gray-50 dark:bg-gray-700/50 p-4">
-            <pre className="max-h-[calc(100vh-12rem)] overflow-y-auto whitespace-pre-wrap text-base leading-relaxed text-gray-700 dark:text-gray-300 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
+            <pre className="max-h-80 overflow-y-auto whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
               {question.answer}
             </pre>
           </div>
         </div>
 
-        {!isExpanded && (
-          <button
-            onClick={() => setIsExpanded(true)}
-            className="mt-2 flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:text-gray-900 dark:hover:text-gray-100"
-          >
-            Show answer
-            <ChevronDown className="h-4 w-4" />
-          </button>
-        )}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="mt-2 flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:text-gray-900 dark:hover:text-gray-100"
+        >
+          {isExpanded ? "Hide" : "Show"} answer
+          <ChevronDown
+            className={`h-4 w-4 transition-transform ${
+              isExpanded ? "rotate-180" : ""
+            }`}
+          />
+        </button>
       </div>
     </div>
   );
