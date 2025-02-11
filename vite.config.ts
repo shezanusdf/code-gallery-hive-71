@@ -5,10 +5,14 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode, command }) => ({
   server: {
     port: 8080,
-    host: "0.0.0.0", // Standard way to listen on all network interfaces
+    host: true, // This enables all host addresses including IPv6
+  },
+  preview: {
+    port: 8080,
+    host: true, // This enables all host addresses including IPv6
   },
   plugins: [
     react(),
