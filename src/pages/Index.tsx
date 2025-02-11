@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { SearchBar } from "../components/SearchBar";
 import { QuestionCard } from "../components/QuestionCard";
@@ -7,6 +7,7 @@ import { ThemeToggle } from "../components/ThemeToggle";
 import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Question {
   id: number;
@@ -33,6 +34,48 @@ async function fetchQuestions(): Promise<Question[]> {
 
 export default function Index() {
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
+  
+  // Migrate localStorage data if it exists
+  useEffect(() => {
+    const migrateLocalStorage = async () => {
+      const localQuestions = localStorage.getItem('questions');
+      if (localQuestions) {
+        try {
+          const questions = JSON.parse(localQuestions);
+          for (const question of questions) {
+            const { error } = await supabase
+              .from('questions')
+              .insert({
+                title: question.title,
+                description: question.description,
+                answer: question.answer,
+                tags: question.tags || []
+              });
+            
+            if (error) throw error;
+          }
+          
+          // Clear localStorage after successful migration
+          localStorage.removeItem('questions');
+          
+          toast({
+            title: "Data Migration Complete",
+            description: "Your previously entered questions have been recovered.",
+          });
+        } catch (error) {
+          console.error('Migration error:', error);
+          toast({
+            title: "Migration Error",
+            description: "There was an error recovering your questions.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    migrateLocalStorage();
+  }, [toast]);
   
   const { data: questions = [], isLoading, error } = useQuery({
     queryKey: ['questions'],
