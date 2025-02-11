@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { SearchBar } from "../components/SearchBar";
 import { QuestionCard } from "../components/QuestionCard";
@@ -8,7 +8,16 @@ import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
-async function fetchQuestions() {
+interface Question {
+  id: number;
+  created_at: string;
+  title: string;
+  description: string;
+  answer: string;
+  tags: string[];
+}
+
+async function fetchQuestions(): Promise<Question[]> {
   const { data, error } = await supabase
     .from('questions')
     .select('*')
@@ -19,7 +28,7 @@ async function fetchQuestions() {
     throw error;
   }
   
-  return data;
+  return data || [];
 }
 
 export default function Index() {
