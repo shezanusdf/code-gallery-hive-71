@@ -19,17 +19,24 @@ interface Question {
 }
 
 async function fetchQuestions(): Promise<Question[]> {
-  const { data, error } = await supabase
-    .from('questions')
-    .select('*')
-    .order('created_at', { ascending: false });
+  try {
+    console.log('Attempting to fetch questions from Supabase...');
+    const { data, error } = await supabase
+      .from('questions')
+      .select('*')
+      .order('created_at', { ascending: false });
+      
+    if (error) {
+      console.error('Supabase error fetching questions:', error);
+      throw new Error(`Failed to fetch questions: ${error.message}`);
+    }
     
-  if (error) {
-    console.error('Error fetching questions:', error);
+    console.log('Successfully fetched questions:', data);
+    return data || [];
+  } catch (error) {
+    console.error('Error in fetchQuestions:', error);
     throw error;
   }
-  
-  return data || [];
 }
 
 export default function Index() {
@@ -39,11 +46,14 @@ export default function Index() {
   // Migrate localStorage data if it exists
   useEffect(() => {
     const migrateLocalStorage = async () => {
-      const localQuestions = localStorage.getItem('questions');
-      if (localQuestions) {
-        try {
+      try {
+        const localQuestions = localStorage.getItem('questions');
+        if (localQuestions) {
+          console.log('Found questions in localStorage, attempting migration...');
           const questions = JSON.parse(localQuestions);
+          
           for (const question of questions) {
+            console.log('Migrating question:', question);
             const { error } = await supabase
               .from('questions')
               .insert({
@@ -53,24 +63,27 @@ export default function Index() {
                 tags: question.tags || []
               });
             
-            if (error) throw error;
+            if (error) {
+              console.error('Error during question migration:', error);
+              throw error;
+            }
           }
           
-          // Clear localStorage after successful migration
           localStorage.removeItem('questions');
+          console.log('Migration completed successfully');
           
           toast({
             title: "Data Migration Complete",
             description: "Your previously entered questions have been recovered.",
           });
-        } catch (error) {
-          console.error('Migration error:', error);
-          toast({
-            title: "Migration Error",
-            description: "There was an error recovering your questions.",
-            variant: "destructive",
-          });
         }
+      } catch (error) {
+        console.error('Migration error:', error);
+        toast({
+          title: "Migration Error",
+          description: "There was an error recovering your questions.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -80,6 +93,8 @@ export default function Index() {
   const { data: questions = [], isLoading, error } = useQuery({
     queryKey: ['questions'],
     queryFn: fetchQuestions,
+    retry: 3,
+    retryDelay: 1000,
   });
 
   const filteredQuestions = questions.filter((question) =>
@@ -95,7 +110,13 @@ export default function Index() {
   }
 
   if (error) {
-    return <div className="flex justify-center items-center min-h-screen">Error loading questions</div>;
+    console.error('React Query error:', error);
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen gap-4">
+        <div className="text-red-500">Error loading questions</div>
+        <div className="text-sm text-gray-500">Please check the console for more details</div>
+      </div>
+    );
   }
 
   return (
